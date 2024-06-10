@@ -3,8 +3,8 @@ const sql = require('mssql');
 const app = express();
 
 const config = {
-    server: 'your_server.database.windows.net',
-    database: 'your_database',
+    server: 'uihc-unifier.database.windows.net',
+    database: 'FormData',
     options: {
         encrypt: true
     },
@@ -14,7 +14,7 @@ const config = {
             msiEndpoint: 'http://169.254.169.254/metadata/identity/oauth2/token',
             msiSecret: '',
             resource: 'https://database.windows.net/',
-            authority: 'https://login.microsoftonline.com/<your-tenant-id>'
+            authority: 'https://login.microsoftonline.com/1bc44595-9aba-4fc3-b8ec-7b94a5586fdc'
         }
     }
 };
@@ -25,11 +25,11 @@ app.get('/api/projectrequests', function(req, res) {
 
         let sqlRequest = new sql.Request();
 
-        let sqlQuery = 'SELECT * FROM ProjectRequests';
+        let sqlQuery = 'SELECT * FROM FormData';
         sqlRequest.query(sqlQuery, function(err, data) {
             if (err) console.log(err);
             
-            res.json(data.recordset); // this will return the JSON data
+            res.json(data.recordset);
         });
     });
 });

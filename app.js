@@ -1,29 +1,39 @@
 const express = require('express');
 const sql = require('mssql');
 const app = express();
-const port = 3000;
 
 const config = {
-  user: 'CloudSAd91cd62d',
-  password: 'password',
-  server: 'uihc-unifier.database.windows.net',
-  database: 'FormSubmissions',
-  options: {
-    encrypt: true
-  }
+    server: 'your_server.database.windows.net',
+    database: 'your_database',
+    options: {
+        encrypt: true
+    },
+    authentication: {
+        type: 'azure-active-directory-msi-app-service',
+        options: {
+            msiEndpoint: 'http://169.254.169.254/metadata/identity/oauth2/token',
+            msiSecret: '',
+            resource: 'https://database.windows.net/',
+            authority: 'https://login.microsoftonline.com/<your-tenant-id>'
+        }
+    }
 };
 
-app.get('/api/formdata', async (req, res) => {
-  try {
-    await sql.connect(config);
-    const result = await sql.query('SELECT * FROM FormData');
-    res.json(result.recordset);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
+app.get('/api/projectrequests', function(req, res) {
+    sql.connect(config, function(err) {
+        if (err) console.log(err);
+
+        let sqlRequest = new sql.Request();
+
+        let sqlQuery = 'SELECT * FROM ProjectRequests';
+        sqlRequest.query(sqlQuery, function(err, data) {
+            if (err) console.log(err);
+            
+            res.json(data.recordset); // this will return the JSON data
+        });
+    });
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+const server = app.listen(5000, function() {
+    console.log('Server is running on port 5000..');
 });
